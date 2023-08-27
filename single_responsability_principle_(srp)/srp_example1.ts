@@ -25,7 +25,12 @@
 
 //#region GOOD EXAMPLE
 class Book {
-  constructor(private _author: string, private _title: string) {}
+  private _author: string;
+  private _title: string;
+  constructor(author: string, title: string) {
+    this._author = author;
+    this._title = title;
+  }
 
   private set change_author(author: string) {
     this._author = author;
@@ -46,20 +51,38 @@ class Book {
   }
 }
 
+class Aventure extends Book{
+  private _history = "";
+
+  constructor(author: string,title: string, history: string) {
+    super(author, title);
+    this._history = history;
+  }
+
+  public get history(): string {
+    return this._history;
+  }
+
+}
+
 interface RepositoryInterface<T> {
-  save(entity: T): void;
+  resume(entity: T): void;
 }
 
 class BookRepository<T extends Book> implements RepositoryInterface<T> {
-  save(book: Book): void {
-    // Save book in the database
-    console.log("GUARDANDO EL LIBRO")
+  resume(book: T): void {
+      if (book instanceof Aventure) {
+      console.log(`El libro de ${book.author} con título ${book.title} trata de ${book.history}`);
+    } else {
+      console.log(`El libro de ${book.author} con título ${book.title} no tiene historia.`);
+    }
   }
 }
 
-const book = new Book("Manuel Entrena", "Los principios solid en typescript")
+const aventure = new Aventure("Manuel Entrena", "historia de la programación", "La historia de como me converti en programador")
+const book = new Book("J.R. Tolkien", "The Lord of the Ring")
 const repositoryBooks = new BookRepository();
-book.changeAuthor = "";
-repositoryBooks.save(book);
+repositoryBooks.resume(aventure);
+repositoryBooks.resume(book);
 
 //#endregion

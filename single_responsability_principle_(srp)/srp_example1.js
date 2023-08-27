@@ -1,6 +1,19 @@
 //#region BAD EXAMPLE
 // class Book {
 //   constructor(private _author: string, private _title: string) {}
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 //   get author(): string {
 //     return this._author;
 //   }
@@ -16,9 +29,9 @@
 //#endregion
 //#region GOOD EXAMPLE
 var Book = /** @class */ (function () {
-    function Book(_author, _title) {
-        this._author = _author;
-        this._title = _title;
+    function Book(author, title) {
+        this._author = author;
+        this._title = title;
     }
     Object.defineProperty(Book.prototype, "change_author", {
         set: function (author) {
@@ -54,17 +67,39 @@ var Book = /** @class */ (function () {
     });
     return Book;
 }());
+var Aventure = /** @class */ (function (_super) {
+    __extends(Aventure, _super);
+    function Aventure(author, title, history) {
+        var _this = _super.call(this, author, title) || this;
+        _this._history = "";
+        _this._history = history;
+        return _this;
+    }
+    Object.defineProperty(Aventure.prototype, "history", {
+        get: function () {
+            return this._history;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return Aventure;
+}(Book));
 var BookRepository = /** @class */ (function () {
     function BookRepository() {
     }
-    BookRepository.prototype.save = function (book) {
-        // Save book in the database
-        console.log("GUARDANDO EL LIBRO");
+    BookRepository.prototype.resume = function (book) {
+        if (book instanceof Aventure) {
+            console.log("El libro de " + book.author + " con t\u00EDtulo " + book.title + " trata de " + book.history);
+        }
+        else {
+            console.log("El libro de " + book.author + " con t\u00EDtulo " + book.title + " no tiene historia.");
+        }
     };
     return BookRepository;
 }());
-var book = new Book("Manuel Entrena", "Los principios solid en typescript");
+var aventure = new Aventure("Manuel Entrena", "historia de la programación", "La historia de como me converti en programador");
+var book = new Book("J.R. Tolkien", "The Lord of the Ring");
 var repositoryBooks = new BookRepository();
-book.changeAuthor = "";
-repositoryBooks.save(book);
+repositoryBooks.resume(aventure);
+repositoryBooks.resume(book);
 //#endregion
