@@ -58,18 +58,48 @@
 
 
 //#region GOOD  EXAMPLE WITH TYPES
+
+const API = "https://jsonplaceholder.typicode.com";
+
+type Geo = {
+  lat: string;
+  lng: string;
+}
+
+type Address = {
+  street: string;
+  suite: string;
+  city: string;
+  zipcode: string;
+  geo: Geo;
+}
+
+type Company = {
+  name: string;
+  catchPhrase: string;
+  bs: string;
+}
+
 type Entity = {
     readonly id: number;
-    readonly name: string;
 };
 
-type Course = Entity & {
-    readonly subjects: ReadonlyArray<string>;
-};
+type User = Entity & {
+  name: string;
+  username: string;
+  email: string;
+  address: Address;
+  phone: string;
+  website: string;
+  company: Company;
+}
 
-type Student = Entity & {
-    course: Course;
-};
+type Post = Entity & {
+  title: string;
+  body: string;
+  userId: number;
+  user: User;
+}
 
 const fetchEntity =
     <FetchedEntity extends Entity>(endpoint: string) =>
@@ -78,12 +108,31 @@ const fetchEntity =
             response => response.json() as Promise<FetchedEntity>,
         );
 
-const fetchCourse = fetchEntity<Course>("courses");
-const fetchStudent = fetchEntity<Student>("students");
+const fetchUser = fetchEntity<User>("users");
+const fetchPost = fetchEntity<Post>("posts");
 
-fetchStudent(42)
-    .then(({ course }) => fetchCourse(course.id))
-    .then(console.log)
-    .catch(console.error);
+async function getPostAndUser(postId: number) {
+  try {
+    const post = await fetchPost(postId);
+    const user = await fetchUser(post.userId);
+    return { ...post, user };
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return null;
+  }
+}
 
+getPostAndUser(42).then((PostAndUser) => {
+  if (PostAndUser) {
+    console.log({PostAndUser});
+  }
+});
+
+
+
+
+
+
+
+    
 //#endregion
