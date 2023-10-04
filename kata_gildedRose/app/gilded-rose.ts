@@ -1,7 +1,8 @@
-const ENTRADA = "Backstage passes to a TAFKAL80ETC concert";
-const QUESO = "Aged Brie";
-const SULFURO = "Sulfuras, Hand of Ragnaros";
-const CONJURO = "Conjured";
+const TICKET = "Backstage passes to a TAFKAL80ETC concert";
+const CHEESE = "Aged Brie";
+const SULFURE = "Sulfuras, Hand of Ragnaros";
+const CONJURE = "Conjured";
+const QUALITYMAX = 50;
 
 export class Item {
   name: string;
@@ -23,56 +24,77 @@ export class GildedRose {
   }
 
   updateQuality(): Item[] {
-    let newQuality = 0;
+
     for (let i = 0; i < this.items.length; i++) {
       switch (this.items[i].name) {
-        case QUESO:
-          if (this.items[i].quality < 50) {
-            this.items[i].quality = this.items[i].quality + 1
-          }
-
-          if (this.items[i].quality < 50 && this.items[i].sellIn <= 0) {
-            this.items[i].quality = this.items[i].quality + 1
-          }
-
-          this.items[i].sellIn = this.items[i].sellIn - 1;
+        case CHEESE:
+          this.items[i] = this.changeQualityCheese({ ...this.items[i] });
           break;
-        case ENTRADA:
-          if (this.items[i].sellIn > 10) {
-              newQuality = 1;
-          } else if (this.items[i].sellIn >= 6) {
-              newQuality = 2;
-          } else if (this.items[i].sellIn > 0) {
-              newQuality = 3;
-          } else {
-              this.items[i].quality = 0;
-          }
-
-          this.items[i].quality = Math.min(50, this.items[i].quality + newQuality);
-          this.items[i].sellIn--;
+        case TICKET:
+          this.items[i] = this.changeQualityTicket({ ...this.items[i] });
           break;
-        case SULFURO:
-
+        case SULFURE:
           break;
-        case CONJURO:
-          if (this.items[i].quality > 0) {
-            this.items[i].quality = this.items[i].quality - 1
-          }
-          if (this.items[i].quality > 0) {
-            this.items[i].quality = this.items[i].quality - 1
-          }
-          this.items[i].sellIn = this.items[i].sellIn - 1;
+        case CONJURE:
+          this.items[i] = this.changeQualityConjure({ ...this.items[i] })
           break;
         default:
-          if (this.items[i].quality > 0) {
-            this.items[i].quality = this.items[i].quality - 1
-          }
-
-          this.items[i].sellIn = this.items[i].sellIn - 1;
+          this.items[i] = this.changeQualityDefault({ ...this.items[i] })
           break;
       }
     }
 
     return this.items;
   }
+
+  changeQualityDefault(item: Item): Item {
+    if (item.quality > 0) {
+      item.quality--;
+    }
+    item.sellIn--;
+    return item;
+  }
+
+  changeQualityConjure(item: Item): Item {
+    if (item.quality > 0) {
+      item.quality--;
+    }
+    if (item.quality > 0) {
+      item.quality--;
+    }
+    item.sellIn--;
+    return item;
+  }
+
+  changeQualityCheese(item: Item): Item {
+    if (item.quality < QUALITYMAX) {
+      item.quality++;
+    }
+
+    if (item.quality < QUALITYMAX && item.sellIn <= 0) {
+      item.quality++;
+    }
+
+    item.sellIn--;
+    return item;
+  }
+
+  changeQualityTicket(item: Item): Item {
+    if (item.sellIn > 0) {
+        item.quality = Math.min(QUALITYMAX, item.quality + this.calculateNewQuality(item.sellIn));
+    } else {
+        item.quality = 0;
+    }
+    item.sellIn--;
+    return item;
+  }
+
+  calculateNewQuality(sellIn: number): number {
+    return sellIn > 10 ? 1 : sellIn >= 6 ? 2 : sellIn > 0 ? 3 : 0;
+  }
+
+
+
+
+
 }
