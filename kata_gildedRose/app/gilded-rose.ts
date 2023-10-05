@@ -44,13 +44,34 @@ class ItemDefault implements ItemService {
     }
 }
 
-class ItemConjure implements ItemService {
-    private readonly item: Item;
+class ItemBase implements ItemService {
+  public readonly item: Item;
 
-    constructor(item: Item) {
-        this.item = item;
+  constructor(item: Item) {
+    this.item = item;
+  }
+
+  changeQuality(): void {
+    if (this.item.quality > 0) {
+      this.item.quality--;
     }
+  }
 
+  changeSellIn(): void {
+    this.item.sellIn--;
+  }
+
+  getItem(): Item {
+    return this.item;
+  }
+}
+
+class ItemSulfure extends ItemBase {
+    changeQuality(): void {}
+    changeSellIn(): void {}
+}
+
+class ItemConjure extends ItemBase {
     changeQuality(): void {
       if (this.item.quality > 0) {
         this.item.quality--;
@@ -59,23 +80,9 @@ class ItemConjure implements ItemService {
         this.item.quality--;
       }
     }
-
-    changeSellIn(): void {
-      this.item.sellIn--;
-    }
-
-    getItem(): Item {
-      return this.item;
-    }
 }
 
-class ItemCheese implements ItemService {
-    private readonly item: Item;
-
-    constructor(item: Item) {
-        this.item = item;
-    }
-
+class ItemCheese extends ItemBase {
     changeQuality(): void {
       if (this.item.quality < QUALITYMAX) {
         this.item.quality++;
@@ -85,23 +92,9 @@ class ItemCheese implements ItemService {
         this.item.quality++;
       }
     }
-
-    changeSellIn(): void {
-      this.item.sellIn--;
-    }
-
-    getItem(): Item {
-      return this.item;
-    }
 }
 
-class ItemTicket implements ItemService {
-    private readonly item: Item;
-
-    constructor(item: Item) {
-        this.item = item;
-    }
-
+class ItemTicket extends ItemBase {
     changeQuality(): void {
       if (this.item.sellIn > 0) {
           this.item.quality = Math.min(QUALITYMAX, this.item.quality + this.calculateNewQuality());
@@ -112,14 +105,6 @@ class ItemTicket implements ItemService {
 
     calculateNewQuality(): number {
       return this.item.sellIn > 10 ? 1 : this.item.sellIn >= 6 ? 2 : this.item.sellIn > 0 ? 3 : 0;
-    }
-
-    changeSellIn(): void {
-      this.item.sellIn--;
-    }
-
-    getItem(): Item {
-      return this.item;
     }
 }
 
@@ -133,42 +118,28 @@ export class GildedRose {
   updateQuality(): Item[] {
 
     for (let i = 0; i < this.items.length; i++) {
-      switch (this.items[i].name) {
-
-        case CHEESE:
-          // eslint-disable-next-line no-case-declarations
-          const itemCheese = new ItemCheese(this.items[i]);
-          itemCheese.changeQuality();
-          itemCheese.changeSellIn()
-          this.items[i] = itemCheese.getItem();
-          break;
-        case TICKET:
-          // eslint-disable-next-line no-case-declarations
-          const itemTicket = new ItemTicket(this.items[i]);
-          itemTicket.changeQuality();
-          itemTicket.changeSellIn()
-          this.items[i] = itemTicket.getItem();
-          break;
-        case SULFURE:
-          break;
-        case CONJURE:
-          // eslint-disable-next-line no-case-declarations
-          const itemConjure = new ItemConjure(this.items[i]);
-          itemConjure.changeQuality();
-          itemConjure.changeSellIn()
-          this.items[i] = itemConjure.getItem();
-          break;
-        default:
-          // eslint-disable-next-line no-case-declarations
-          const itemDefault = new ItemDefault(this.items[i]);
-          itemDefault.changeQuality();
-          itemDefault.changeSellIn()
-          this.items[i] = itemDefault.getItem();
-          break;
-      }
+      const currentItem = this.createItemService(this.items[i]);
+      currentItem.changeQuality();
+      currentItem.changeSellIn();
+      this.items[i] = currentItem.getItem();
     }
 
     return this.items;
+  }
+
+  createItemService(item: Item): ItemService {
+    switch (item.name) {
+      case CHEESE:
+        return new ItemCheese(item);
+      case TICKET:
+        return new ItemTicket(item);
+      case SULFURE:
+        return new ItemSulfure(item);
+      case CONJURE:
+        return new ItemConjure(item);
+      default:
+        return new ItemDefault(item);
+    }
   }
 }
 
