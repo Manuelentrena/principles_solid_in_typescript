@@ -22,29 +22,9 @@ interface ItemService {
   getItem: () => Item;
 }
 
+
+
 class ItemDefault implements ItemService {
-    private readonly item: Item;
-
-    constructor(item: Item) {
-        this.item = item;
-    }
-
-    changeQuality(): void {
-      if (this.item.quality > 0) {
-        this.item.quality--;
-      }
-    }
-
-    changeSellIn(): void {
-      this.item.sellIn--;
-    }
-
-    getItem(): Item {
-      return this.item;
-    }
-}
-
-class ItemBase implements ItemService {
   public readonly item: Item;
 
   constructor(item: Item) {
@@ -66,12 +46,12 @@ class ItemBase implements ItemService {
   }
 }
 
-class ItemSulfure extends ItemBase {
+class ItemSulfure extends ItemDefault {
     changeQuality(): void {}
     changeSellIn(): void {}
 }
 
-class ItemConjure extends ItemBase {
+class ItemConjure extends ItemDefault {
     changeQuality(): void {
       if (this.item.quality > 0) {
         this.item.quality--;
@@ -82,7 +62,7 @@ class ItemConjure extends ItemBase {
     }
 }
 
-class ItemCheese extends ItemBase {
+class ItemCheese extends ItemDefault {
     changeQuality(): void {
       if (this.item.quality < QUALITYMAX) {
         this.item.quality++;
@@ -94,7 +74,7 @@ class ItemCheese extends ItemBase {
     }
 }
 
-class ItemTicket extends ItemBase {
+class ItemTicket extends ItemDefault {
     changeQuality(): void {
       if (this.item.sellIn > 0) {
           this.item.quality = Math.min(QUALITYMAX, this.item.quality + this.calculateNewQuality());
