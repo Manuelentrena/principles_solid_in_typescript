@@ -16,6 +16,113 @@ export class Item {
   }
 }
 
+interface ItemService {
+  changeQuality: () => void;
+  changeSellIn: () => void;
+  getItem: () => Item;
+}
+
+class ItemDefault implements ItemService {
+    private readonly item: Item;
+
+    constructor(item: Item) {
+        this.item = item;
+    }
+
+    changeQuality(): void {
+      if (this.item.quality > 0) {
+        this.item.quality--;
+      }
+    }
+
+    changeSellIn(): void {
+      this.item.sellIn--;
+    }
+
+    getItem(): Item {
+      return this.item;
+    }
+}
+
+class ItemConjure implements ItemService {
+    private readonly item: Item;
+
+    constructor(item: Item) {
+        this.item = item;
+    }
+
+    changeQuality(): void {
+      if (this.item.quality > 0) {
+        this.item.quality--;
+      }
+      if (this.item.quality > 0) {
+        this.item.quality--;
+      }
+    }
+
+    changeSellIn(): void {
+      this.item.sellIn--;
+    }
+
+    getItem(): Item {
+      return this.item;
+    }
+}
+
+class ItemCheese implements ItemService {
+    private readonly item: Item;
+
+    constructor(item: Item) {
+        this.item = item;
+    }
+
+    changeQuality(): void {
+      if (this.item.quality < QUALITYMAX) {
+        this.item.quality++;
+      }
+
+      if (this.item.quality < QUALITYMAX && this.item.sellIn <= 0) {
+        this.item.quality++;
+      }
+    }
+
+    changeSellIn(): void {
+      this.item.sellIn--;
+    }
+
+    getItem(): Item {
+      return this.item;
+    }
+}
+
+class ItemTicket implements ItemService {
+    private readonly item: Item;
+
+    constructor(item: Item) {
+        this.item = item;
+    }
+
+    changeQuality(): void {
+      if (this.item.sellIn > 0) {
+          this.item.quality = Math.min(QUALITYMAX, this.item.quality + this.calculateNewQuality());
+      } else {
+          this.item.quality = 0;
+      }
+    }
+
+    calculateNewQuality(): number {
+      return this.item.sellIn > 10 ? 1 : this.item.sellIn >= 6 ? 2 : this.item.sellIn > 0 ? 3 : 0;
+    }
+
+    changeSellIn(): void {
+      this.item.sellIn--;
+    }
+
+    getItem(): Item {
+      return this.item;
+    }
+}
+
 export class GildedRose {
   items: Item[];
 
@@ -27,74 +134,47 @@ export class GildedRose {
 
     for (let i = 0; i < this.items.length; i++) {
       switch (this.items[i].name) {
+
         case CHEESE:
-          this.items[i] = this.changeQualityCheese({ ...this.items[i] });
+          // eslint-disable-next-line no-case-declarations
+          const itemCheese = new ItemCheese(this.items[i]);
+          itemCheese.changeQuality();
+          itemCheese.changeSellIn()
+          this.items[i] = itemCheese.getItem();
           break;
         case TICKET:
-          this.items[i] = this.changeQualityTicket({ ...this.items[i] });
+          // eslint-disable-next-line no-case-declarations
+          const itemTicket = new ItemTicket(this.items[i]);
+          itemTicket.changeQuality();
+          itemTicket.changeSellIn()
+          this.items[i] = itemTicket.getItem();
           break;
         case SULFURE:
           break;
         case CONJURE:
-          this.items[i] = this.changeQualityConjure({ ...this.items[i] })
+          // eslint-disable-next-line no-case-declarations
+          const itemConjure = new ItemConjure(this.items[i]);
+          itemConjure.changeQuality();
+          itemConjure.changeSellIn()
+          this.items[i] = itemConjure.getItem();
           break;
         default:
-          this.items[i] = this.changeQualityDefault({ ...this.items[i] })
+          // eslint-disable-next-line no-case-declarations
+          const itemDefault = new ItemDefault(this.items[i]);
+          itemDefault.changeQuality();
+          itemDefault.changeSellIn()
+          this.items[i] = itemDefault.getItem();
           break;
       }
     }
 
     return this.items;
   }
-
-  changeQualityDefault(item: Item): Item {
-    if (item.quality > 0) {
-      item.quality--;
-    }
-    item.sellIn--;
-    return item;
-  }
-
-  changeQualityConjure(item: Item): Item {
-    if (item.quality > 0) {
-      item.quality--;
-    }
-    if (item.quality > 0) {
-      item.quality--;
-    }
-    item.sellIn--;
-    return item;
-  }
-
-  changeQualityCheese(item: Item): Item {
-    if (item.quality < QUALITYMAX) {
-      item.quality++;
-    }
-
-    if (item.quality < QUALITYMAX && item.sellIn <= 0) {
-      item.quality++;
-    }
-
-    item.sellIn--;
-    return item;
-  }
-
-  changeQualityTicket(item: Item): Item {
-    if (item.sellIn > 0) {
-        item.quality = Math.min(QUALITYMAX, item.quality + this.calculateNewQuality(item.sellIn));
-    } else {
-        item.quality = 0;
-    }
-    item.sellIn--;
-    return item;
-  }
-
-  calculateNewQuality(sellIn: number): number {
-    return sellIn > 10 ? 1 : sellIn >= 6 ? 2 : sellIn > 0 ? 3 : 0;
-  }
-
-
-
-
-
 }
+
+
+
+
+
+
+
