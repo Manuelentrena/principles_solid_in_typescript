@@ -1,3 +1,5 @@
+// https://stackblitz.com/edit/mocha-typescript-8qqp2w?file=gilded-rose.ts
+
 const TICKET = "Backstage passes to a TAFKAL80ETC concert";
 const CHEESE = "Aged Brie";
 const SULFURE = "Sulfuras, Hand of Ragnaros";
@@ -21,8 +23,6 @@ interface ItemService {
   changeSellIn: () => void;
   getItem: () => Item;
 }
-
-
 
 class ItemDefault implements ItemService {
   public readonly item: Item;
