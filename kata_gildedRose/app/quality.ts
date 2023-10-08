@@ -1,11 +1,14 @@
 export class Quality {
+  public static readonly MAX_VALUE_SULFURA = 80;
   public static readonly MAX_VALUE = 50;
   public static readonly MIN_VALUE = 0;
 
   private value: number;
+  private readonly isSulfura: boolean;
 
-  constructor(value: number) {
-    this.value = this.validatedQuality(value);
+  constructor(value: number, isSulfura: boolean = false) {
+    this.value = !isSulfura ? this.validatedQuality(value) : Quality.MAX_VALUE_SULFURA;
+    this.isSulfura = isSulfura;
   }
 
   public getValue(): number {
@@ -13,15 +16,21 @@ export class Quality {
   }
 
   public decrease(value: number): void {
-    this.value -= value;
+    if (!this.isSulfura) {
+      this.value = this.validatedQuality(this.value - value);
+    }
   }
 
   public increase(value: number): void {
-    this.value += value;
+    if (!this.isSulfura) {
+      this.value = this.validatedQuality(this.value + value);
+    }
   }
 
   public resetQuality(): void {
-    this.value = Quality.MIN_VALUE;
+    if (!this.isSulfura) {
+      this.value = Quality.MIN_VALUE;
+    }
   }
 
   private validatedQuality(value: number): number {

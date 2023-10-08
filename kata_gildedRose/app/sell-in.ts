@@ -1,4 +1,5 @@
 export class SellIn {
+  public static readonly INFINITE_VALUE = Infinity;
   private value: number;
 
   constructor(value: number) {
